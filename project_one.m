@@ -2,8 +2,8 @@ close all
 clear all
 
 %% adjustable parameters
-row= 256;               % image reshape dimension
-col = 256;
+row= 64;               % image reshape dimension
+col = row;
 b=8;                    %number of bit for quantization
 noisepower = .005;
 noisepower = .05;
@@ -15,10 +15,15 @@ alpha = 0.5;                  % roll-off factor for SRRC pulse
 
 
 %% image preparation
-I=imread('Sample_Image.jpg');
-I=im2double(I);
-I=rgb2gray(I);
+I = imread('dc_64.jpg');
+I = im2double(I);
+I = rgb2gray(I);
 I = imresize(I, [row col]);
+img = I;
+% I = blkproc(I, [8 8], @dct2);
+dct_img = I;
+imshow(dct_img)
+imshow([blkproc(I,[8 8],@idct2) I]);
 I = uencode(I,b);                   % intensity between [0,2^8] integer uencode(I,b)
 %%
 %encoding
@@ -45,18 +50,18 @@ switch modfun
 end
 
 
-figure
-plot(pulse);
-title(' pulse waveform')
-xlabel('Time')
-ylabel('Value')
+% figure
+% plot(pulse);
+% title(' pulse waveform')
+% xlabel('Time')
+% ylabel('Value')
 
 
 mod=data*pulse + (data-1)*pulse;
 mod=mod';
 mod=mod(:);
 raw=data;
-eyediagram(mod(1:3200), 64);
+% eyediagram(mod(1:3200), 64);
 
 %% channel
 hc = [1; zeros(31,1); 0.5 ;zeros(31,1) ;0.75 ;zeros(31,1) ; (-2/7)];
@@ -73,18 +78,18 @@ dataC=filter(hc,1,mod);
 var =  sqrt(noisepower);
 noise = var .* rand(size(dataC));
 dataN=dataC+noise;
-eyediagram(dataN(1:3200), 64);
+% eyediagram(dataN(1:3200), 64);
 
 %% Matched Filter
 % MF=dataN(end:-1:1);
 MF=pulse(end:-1:1);
 MF=[MF'];
 dataM=filter(MF,1,dataN);
-subplot(2,1,1);plot(dataN(1:640));
-subplot(2,1,2);plot(dataM(1:640));
+% subplot(2,1,1);plot(dataN(1:640));
+% subplot(2,1,2);plot(dataM(1:640));
 % eyediagram(dataM(1:3200), 64);
 % dataMa=dataM(16:end);
-eyediagram(dataM(1:3200), 64);
+% eyediagram(dataM(1:3200), 64);
 % dataM=dataMa;
 %% channel impairment compensation 
 % ZF Equalizer inverse of B(z)/A(z)
@@ -122,6 +127,9 @@ dataR=bin2dec(RxDC(:,:));
 dataR=reshape(dataR,[row col]);
 dataR=uint8(dataR);
 dataR = udecode(dataR,b);
-imshow(dataR) 
+% figure;imshow(dct_img);
+figure;imshow([dataR dct_img]);
+% dataR = blkproc(dataR, [8 8], @idct2);
+figure;imshow([img dataR]) 
 
 

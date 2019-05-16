@@ -8,7 +8,7 @@ function out_strm = channel(stream, h, sigma)
 
 % freqz(h);
 % plot(fft(h));
-echoed = conv(h, stream);
+echoed = filter(h,1,stream);
 % add gaussian noise with power sigma
 out_strm = echoed + sigma*randn(size(echoed));
 end
