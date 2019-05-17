@@ -21,17 +21,6 @@ switch fn
         data = filter(pulse,1,data);
 end
 data = data';
-
-% handle = figure;
-% subplot(2,1,1);
-% stem(data(1:320), "r", "fill", "MarkerSize",1);% hold on;
-% plot(sin(pi*t/T)); hold off;
-% legend("Sample of data bits");
-% subplot(2,1,2);
-% stem(freqz(data(1,:)), 'k', 'fill', "MarkerSize", 1);
-% legend("FT of Waveform");
-% saveas(handle,"10bits.png");
 mod_data = data(:);
-pulse = pulse;
 end
 

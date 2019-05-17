@@ -1,16 +1,16 @@
-
-
 close ALL;
 clearvars;
 
-
 % Hyperparameters
-fn = 'halfsine';            % modulation pulse function
+fn = 'srrc';            % modulation pulse function
 do_dct = 0;                 % perform dct
-eq = 'zf';                  % equalizer
-sigma = 0.05;              % noise power
-%h = [1 zeros(1,127) ];     % channel impulse response
-h = [1 zeros(1,31) 0.5 zeros(1,31) 0.75 zeros(1,31) -2/7 zeros(1,31)];
+eq = 'mmse';                  % equalizer
+sigma = 0.25;              % noise power
+% h = [1 zeros(1,127) ];     % dummy channel impulse response
+% h = [1 zeros(1,31) 0.5 zeros(1,31) 0.75 zeros(1,31) -2/7 zeros(1,31)]; % testing channel
+% h = [ 1/2 zeros(1,31) 1 zeros(1,63) 0.63 zeros(1,159) 0.25 zeros(1,127) 0.16 zeros(1,511) 0.1]; % outdoor channel
+h = [1 0.4365 0.1905 0.0832 zeros(1,63) 0.0158 zeros(1,63) 0.003];  % indoor channel
+gain = sum(h.^2);
 
 plots = 0;
 sbc = 6;                    % number of subplots
@@ -18,7 +18,6 @@ i = 1;                      % subplot index
 sb = 100;                     % starting bit for viz
 dur = 50;                   % number of bits to viz
 padding = zeros(16,10);
-
 
 N = 16;                     % block size
 T = 32;                     % sample period
@@ -80,16 +79,15 @@ error = 0;
 for k = 1:N
     error = error + sum(rx_img(:)~=img(:)) / size(img(:),1);          % percentage of errorrness bit
 end
-fprintf('RMS Error: %.2g\n\n',sqrt(error));
-
 
 % Received image:
-% figure;imshow([rx_img img]);
+figure;imshow([rx_img img]);
 
-% figure;
-% freqz(channeled_bit_strm(:));
-eyediagram(channeled_bit_strm(1,1:3200),64);
+snr = 20* log10 (sum(eq_bit_strm(:).^2)/(sigma*numel(eq_bit_strm(:))));
 
+fprintf('RMS Error: %.2g\n\n',sqrt(error));
+fprintf('SNR: %.2g\n\n',SNR);
+fprintf('Channel Gain: %.2g\n\n',gain);
 
 % Plots:
 if plots

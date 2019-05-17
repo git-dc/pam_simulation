@@ -2,8 +2,6 @@ function eq_bit_strm = equalizer(matched_bit_strm, eq_type, h, sigma, N)
 %EQUALIZER Summary of this function goes here
 %   Detailed explanation goes here
 
-
-
 switch eq_type
     case "zf"
         % Zero-Forcing equalization:
@@ -16,7 +14,7 @@ switch eq_type
         % Minimum mean square error equalization:
         eq_bit_strm = zeros(size(matched_bit_strm));
         H = fft(h);
-        Hm = conj(H)./(abs(H).^2 + sigma^2);
+        Hm = conj(H)./(abs(H).^2 + sigma);
         for k = 1:N
             chunk = matched_bit_strm(k,:);
             eq_bit_strm(k,:) = sum(ifft(Hm'.*chunk));
